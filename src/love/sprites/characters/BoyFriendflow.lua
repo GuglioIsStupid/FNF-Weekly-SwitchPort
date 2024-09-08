@@ -1,5 +1,5 @@
 return graphics.newSprite(
-	graphics.imagePath("BoyFriendflow"),
+	graphics.imagePath("characters/BoyFriendflow"),
 	{
 		{x = 5, y = 5, width = 414, height = 412, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 1: BF HEY!!0000
 		{x = 424, y = 5, width = 414, height = 412, offsetX = 0, offsetY = 0, offsetWidth = 0, offsetHeight = 0, rotated = false}, -- 2: BF HEY!!0001
@@ -372,15 +372,15 @@ return graphics.newSprite(
 		{x = 1271, y = 2838, width = 380, height = 403, offsetX = 0, offsetY = -1, offsetWidth = 380, offsetHeight = 404, rotated = false}, -- 369: boyfriend dodge0014
 	},
 	{
-		["hey"] = {start = 1, stop = 26, speed = 24, offsetX = 0, offsetY = 0},
-		["singDOWN"] = {start = 27, stop = 56, speed = 24, offsetX = 0, offsetY = 0},
-		["singDOWN miss"] = {start = 57, stop = 85, speed = 24, offsetX = 0, offsetY = 0},
-		["singLEFT"] = {start = 86, stop = 99, speed = 24, offsetX = 0, offsetY = 0},
-		["singLEFT miss"] = {start = 100, stop = 133, speed = 24, offsetX = 0, offsetY = 0},
-		["singRIGHT"] = {start = 134, stop = 195, speed = 24, offsetX = 0, offsetY = 0},
-		["singRIGHT miss"] = {start = 196, stop = 241, speed = 24, offsetX = 0, offsetY = 0},
-		["singUP"] = {start = 242, stop = 256, speed = 24, offsetX = 0, offsetY = 0},
-		["singUP miss"] = {start = 257, stop = 280, speed = 24, offsetX = 0, offsetY = 0},
+		["hey"] = {start = 1, stop = 26, speed = 24, offsetX = 0, offsetY = 3},
+		["singDOWN"] = {start = 27, stop = 56, speed = 24, offsetX = 16, offsetY = 26},
+		["singDOWN miss"] = {start = 57, stop = 85, speed = 24, offsetX = -6, offsetY = 12},
+		["singLEFT"] = {start = 86, stop = 99, speed = 24, offsetX = 16, offsetY = -2},
+		["singLEFT miss"] = {start = 100, stop = 133, speed = 24, offsetX = 22, offsetY = -7},
+		["singRIGHT"] = {start = 134, stop = 195, speed = 24, offsetX = -40, offsetY = 21},
+		["singRIGHT miss"] = {start = 196, stop = 241, speed = 24, offsetX = -38, offsetY = -6},
+		["singUP"] = {start = 242, stop = 256, speed = 24, offsetX = -24, offsetY = 1},
+		["singUP miss"] = {start = 257, stop = 280, speed = 24, offsetX = -22, offsetY = -7},
 		["hit"] = {start = 281, stop = 299, speed = 24, offsetX = 0, offsetY = 0},
 		["idle"] = {start = 300, stop = 313, speed = 24, offsetX = 0, offsetY = 0},
 		["shaking"] = {start = 314, stop = 317, speed = 24, offsetX = 0, offsetY = 0},
@@ -389,5 +389,10 @@ return graphics.newSprite(
 		["dodge"] = {start = 355, stop = 369, speed = 24, offsetX = 0, offsetY = 0},
 	},
 	"idle",
-	false
+	false,
+	{
+		sing_duration = 4,
+		isCharacter = true,
+		icon = "bf"
+	}
 )

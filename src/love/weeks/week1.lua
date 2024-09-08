@@ -1,29 +1,11 @@
---[[----------------------------------------------------------------------------
-This file is part of Friday Night Funkin' Rewritten
-
-Copyright (C) 2021  HTV04
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-------------------------------------------------------------------------------]]
-
-local stageBack, stageFront, curtains
-
+local stage = stages["house"]
+CAPTION_FONT = love.graphics.newFont("fonts/BRLNSDB.ttf", 50)
 return {
 	enter = function(self, from, songNum, songAppend, _songExt)
+		stage = stages["house"]
 		weeks:enter()
 
-		stages["house"]:enter()
+		stage:enter()
 
 		song = songNum
 		difficulty = songAppend
@@ -33,15 +15,18 @@ return {
 	end,
 
 	load = function(self)
+		stage:load()
 		weeks:load()
-		stages["house"]:load()
 
-		if song == 3 then
-			inst = love.audio.newSource("songs/dadbattle/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/dadbattle/Voices-bf" .. songExt .. ".ogg", "stream")
+		if song == 4 then
+			inst = love.audio.newSource("songs/visiosubrideophobia/Inst.ogg", "stream")
+			voicesBF = love.audio.newSource("songs/visiosubrideophobia/Voices.ogg", "stream")
+		elseif song == 3 then
+			inst = love.audio.newSource("songs/goo/Inst.ogg", "stream")
+			voicesBF = love.audio.newSource("songs/goo/Voices.ogg", "stream")
 		elseif song == 2 then
-			inst = love.audio.newSource("songs/fresh/Inst" .. songExt .. ".ogg", "stream")
-			voicesBF = love.audio.newSource("songs/fresh/Voices-bf" .. songExt .. ".ogg", "stream")
+			inst = love.audio.newSource("songs/teaking/Inst.ogg", "stream")
+			voicesBF = love.audio.newSource("songs/teaking/Voices.ogg", "stream")
 		else
 			inst = love.audio.newSource("songs/boss-tweaks-in-brasil/Inst.ogg", "stream")
 			voicesBF = love.audio.newSource("songs/boss-tweaks-in-brasil/Voices.ogg", "stream")
@@ -51,27 +36,33 @@ return {
 
 		weeks:setupCountdown()
 
-		enemyIcon.visible = false
-
 		camera.lockedMoving = true
 	end,
 
 	initUI = function(self)
 		weeks:initUI()
-		if song == 3 then
-			weeks:generateNotes("data/songs/dadbattle/dadbattle-chart" .. songExt .. ".json", "data/songs/dadbattle/dadbattle-metadata" .. songExt .. ".json", difficulty)
+		if song == 4 then
+			weeks:legacyGenerateNotes("data/songs/visiosubrideophobia/visiosubrideophobia.json")
+			weeks:generatePsychEvents("data/songs/visiosubrideophobia/events.json")
+		elseif song == 3 then
+			weeks:legacyGenerateNotes("data/songs/goo/goo.json")
+			weeks:generatePsychEvents("data/songs/goo/events.json")
 		elseif song == 2 then
-			weeks:generateNotes("data/songs/fresh/fresh-chart" .. songExt .. ".json", "data/songs/fresh/fresh-metadata" .. songExt .. ".json", difficulty)
+			weeks:legacyGenerateNotes("data/songs/teaking/teaking.json")
+			weeks:generatePsychEvents("data/songs/teaking/events.json")
 		else
 			weeks:legacyGenerateNotes("data/songs/boss-tweaks-in-brasil/boss-tweaks-in-brasil.json")
 
 			enemy.visible = false
+
+			camera.lockedMoving = true
+			camera.x = camera.x + 400
 		end
 	end,
 
 	update = function(self, dt)
 		weeks:update(dt)
-		stages["house"]:update(dt)
+		stage:update(dt)
 
 		weeks:checkSongOver()
 
@@ -92,7 +83,7 @@ return {
 	end,
 
 	onEvent = function(self, ...)
-		stages["house"]:onEvent(...)
+		stage:onEvent(...)
 	end,
 
 	draw = function(self)
@@ -100,14 +91,42 @@ return {
 			love.graphics.translate(graphics.getWidth() / 2, graphics.getHeight() / 2)
 			love.graphics.scale(camera.zoom, camera.zoom)
 
-			stages["house"]:draw()
+			stage:draw()
 		love.graphics.pop()
+
+		love.graphics.push()
+			love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
+			stage.br:draw()
+			stage.port:draw()
+			stage.jumpscare:draw()
+		love.graphics.pop()
+
+		stage.bar.x = stage.bar:getWidth()/2
+		stage.bar.y = stage.bar:getHeight()/2
+		stage.bar:draw()
+		stage.bar.x = push:getWidth() - stage.bar:getWidth()/2
+		stage.bar:draw()
+
+		stage.tik:draw()
+
+		love.graphics.push()
+			love.graphics.translate(graphics.getWidth()/2, graphics.getHeight()/2)
+			stage.pee:draw()
+			stage.bee:draw()
+		love.graphics.pop()
+
+		if stage.curCaption ~= "" then
+			local lastFont = love.graphics.getFont()
+			love.graphics.setFont(CAPTION_FONT)
+			uitextf(stage.curCaption, 0, push:getHeight()/2-15, graphics.getWidth(), "center")
+			love.graphics.setFont(lastFont)
+		end
 
 		weeks:drawUI()
 	end,
 
 	leave = function(self)
-		stages["house"]:leave()
+		stage:leave()
 
 		enemy = nil
 		boyfriend = nil
