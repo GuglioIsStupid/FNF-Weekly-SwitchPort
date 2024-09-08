@@ -188,7 +188,7 @@ return {
 				graphics.setColor(1, 1, 1)
 
 				uitextColored("X: " .. tostring(overlaySprite:getCurrentAnim().offsetX + (sprite.x - overlaySprite.x)), 0, (#spriteAnims + 1) * 20)
-				uitextColored("Y: " .. tostring(overlaySprite:getCurrentAnim().offsetY - (sprite.y - overlaySprite.y)), 0, (#spriteAnims + 2) * 20)
+				uitextColored("Y: " .. tostring(-(overlaySprite:getCurrentAnim().offsetY - (sprite.y - overlaySprite.y))), 0, (#spriteAnims + 2) * 20)
 				uitextColored("Frame: " .. tostring(overlaySprite:getFrameFromCurrentAnim()), 0, (#spriteAnims + 3) * 20)
 			end
 		else

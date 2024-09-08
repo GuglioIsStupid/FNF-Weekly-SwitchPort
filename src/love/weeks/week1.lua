@@ -18,6 +18,8 @@ return {
 		stage:load()
 		weeks:load()
 
+		enemyIcon.visible = true
+
 		if song == 4 then
 			inst = love.audio.newSource("songs/visiosubrideophobia/Inst.ogg", "stream")
 			voicesBF = love.audio.newSource("songs/visiosubrideophobia/Voices.ogg", "stream")
@@ -28,6 +30,7 @@ return {
 			inst = love.audio.newSource("songs/teaking/Inst.ogg", "stream")
 			voicesBF = love.audio.newSource("songs/teaking/Voices.ogg", "stream")
 		else
+			enemyIcon.visible = false
 			inst = love.audio.newSource("songs/boss-tweaks-in-brasil/Inst.ogg", "stream")
 			voicesBF = love.audio.newSource("songs/boss-tweaks-in-brasil/Voices.ogg", "stream")
 		end
@@ -43,7 +46,6 @@ return {
 		weeks:initUI()
 		if song == 4 then
 			weeks:legacyGenerateNotes("data/songs/visiosubrideophobia/visiosubrideophobia.json")
-			weeks:generatePsychEvents("data/songs/visiosubrideophobia/events.json")
 		elseif song == 3 then
 			weeks:legacyGenerateNotes("data/songs/goo/goo.json")
 			weeks:generatePsychEvents("data/songs/goo/events.json")

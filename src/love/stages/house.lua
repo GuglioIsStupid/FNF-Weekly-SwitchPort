@@ -41,7 +41,6 @@ return {
         self.br:setGraphicSize(1280, 720)
         self.port:setGraphicSize(1280, 720)
         self.jumpscare:setGraphicSize(1280, 720)
-        print(self.jumpscare.sizeX, self.jumpscare.sizeY)
 
         self.curCaption = ""
 
@@ -49,10 +48,15 @@ return {
     end,
 
     load = function(self)
-        enemyIcon.visible = true
-        
         self.br.alpha, self.port.alpha = 0, 0
         self.jumpscare.visible = false
+        self.bar.alpha = 0
+        self.tik.alpha = 0
+        self.pee.alpha = 0
+        self.bee.alpha = 0
+        self.curCaption = ""
+
+        self.baby.visible = false
 
         if song == 1 then
             boyfriend = BaseCharacter("sprites/characters/tweak.lua")
@@ -63,9 +67,7 @@ return {
 
             enemy.x, enemy.y = -422, 4
             boyfriend.x, boyfriend.y = 130, 12
-
-            enemyIcon.visible = false
-        elseif song == 2 then
+        else
             boyfriend = BaseCharacter("sprites/characters/BoyFriendflow.lua")
             enemy = BaseCharacter("sprites/characters/tweak.lua")
             enemy.sizeX, enemy.sizeY = 2.2, 2.2
