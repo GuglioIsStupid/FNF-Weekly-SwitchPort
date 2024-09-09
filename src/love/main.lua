@@ -284,8 +284,6 @@ function love.load()
 		["Miscillaneous"] = require "substates.options.miscillaneous"
 	}
 
-	TankmanDatingSim = require "misc.dating"
-
 	-- Load week data
 	weekData = require "data.weeks.weekData"
 	weekDesc = require "data.weeks.weekDescriptions"
@@ -430,16 +428,6 @@ function love.keypressed(key)
 		end)
 	elseif key == "7" and not love.keyboard.isDown("lalt") then
 		Gamestate.switch(debugMenu)
-	elseif key == "`" and love.keyboard.isDown("lalt") then
-		status.setLoading(true)
-		graphics:fadeOutWipe(
-			0.7,
-			function()
-				music:stop()
-				Gamestate.switch(TankmanDatingSim)
-				status.setLoading(false)
-			end
-		)
 	elseif key == "0" then
 		volFade = 1
 		if fixVol == 0 then
