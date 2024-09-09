@@ -263,7 +263,7 @@ function love.load()
 	menuFreeplay = require "states.menu.menuFreeplay"
 	menuSettings = require "states.menu.options.OptionsState"
 	menuCredits = require "states.menu.menuCredits"
-	menuSelect = require "states.menu.menuSelect"
+	menuSelect = require "states.menu.tweakMenu"
 	menuMods = require "states.menu.menuMods"
 	resultsScreen = require "states.menu.results"
 
@@ -343,6 +343,7 @@ function love.load()
 	
 	-- Variables
 	font = love.graphics.newFont("fonts/vcr.ttf", 24)
+	newsFont = love.graphics.newFont("fonts/vcr.ttf", 50)
 	optionsFont = love.graphics.newFont("fonts/vcr.ttf", 32)
 	FNFFont = love.graphics.newFont("fonts/fnFont.ttf", 24)
 	credFont = love.graphics.newFont("fonts/fnFont.ttf", 32)   -- guglio is a bitch -- fuck you calling a bitch????

@@ -47,6 +47,8 @@ return {
 
 		graphics.setFade(0)
 		graphics.fadeIn(0.5)
+
+		self:spriteViewerSearch("sprites")
 	end,
 
 	keypressed = function(self, key)

@@ -1,101 +1,116 @@
-#!/usr/bin/env python3
-
-# --------------------------------------------------------------------------------
-# Friday Night Funkin' Rewritten Legacy XML Conversion Helper v1.2
-#
-# Copyright (C) 2021  HTV04
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# --------------------------------------------------------------------------------
-
 import os
 import sys
-
 import xml.etree.ElementTree as ET
+import re
+import random
 
-import re, random
+def parseInt(value, default=0):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
 
-xmlname = os.path.split(sys.argv[1])[1]
-sheetxml = ET.parse(xmlname).getroot()
+def parseBool(value, default=False):
+    if value is None:
+        return default
+    return value.lower() in ['true', '1', 'yes']
 
-imgFile = sheetxml.attrib.get('imagePath', '')
+def generateLuaFromXml(xmlPath):
+    xmlName = os.path.split(xmlPath)[1]
+    try:
+        sheetXml = ET.parse(xmlPath).getroot()
+    except ET.ParseError as e:
+        print(f"Error parsing XML file {xmlPath}: {e}")
+        return
+    
+    imgFile = sheetXml.attrib.get('imagePath', '')
 
-animLists = {}
+    subTextures = {}
+    for subTexture in sheetXml.findall('SubTexture'):
+        name = subTexture.get('name', '')
+        if not name:
+            continue
 
-lua = ('return graphics.newSprite(\n'
-       f'\tgraphics.imagePath("{imgFile.replace(".png", "")}"),\n'
-       '\t{\n'
-       )
-c = 0
-for SubTexture in sheetxml.findall('SubTexture'):
-    c += 1
+        baseName = re.sub(r'\d+$', '', name)
+        if baseName not in subTextures:
+            subTextures[baseName] = []
 
-    name = SubTexture.get('name')
-    x = SubTexture.get('x')
-    y = SubTexture.get('y')
-    width = SubTexture.get('width')
-    height = SubTexture.get('height')
-    offsetx = SubTexture.get('frameX')
-    offsety = SubTexture.get('frameY')
-    offsetWidth = SubTexture.get('frameWidth')
-    offsetHeight = SubTexture.get('frameHeight')
-    rotated = SubTexture.get('rotated')
+        subTextures[baseName].append({
+            'name': name,
+            'x': parseInt(subTexture.get('x')),
+            'y': parseInt(subTexture.get('y')),
+            'width': parseInt(subTexture.get('width')),
+            'height': parseInt(subTexture.get('height')),
+            'offsetX': parseInt(subTexture.get('frameX')),
+            'offsetY': parseInt(subTexture.get('frameY')),
+            'offsetWidth': parseInt(subTexture.get('frameWidth')),
+            'offsetHeight': parseInt(subTexture.get('frameHeight')),
+            'rotated': parseBool(subTexture.get('rotated'))
+        })
 
-    if offsetx is None:
-        offsetx = '0'
-    if offsety is None:
-        offsety = '0'
-    if offsetWidth is None:
-        offsetWidth = '0'
-    if offsetHeight is None:
-        offsetHeight = '0'
-    if rotated is None:
-        rotated = 'false'
+    lua = ('return graphics.newSprite(\n'
+           f'\tgraphics.imagePath("{imgFile.replace(".png", "")}"),\n'
+           '\t{\n'
+           )
+    
+    animLists = {}
+    count = 0
+    for baseName, textures in subTextures.items():
+        textures.sort(key=lambda t: int(re.search(r'(\d+)$', t['name']).group()))
+        
+        for texture in textures:
+            count += 1
+            lua += (f'\t\t{{x = {texture["x"]}, y = {texture["y"]}, width = {texture["width"]}, '
+                    f'height = {texture["height"]}, offsetX = {texture["offsetX"]}, '
+                    f'offsetY = {texture["offsetY"]}, offsetWidth = {texture["offsetWidth"]}, '
+                    f'offsetHeight = {texture["offsetHeight"]}, rotated = {str(texture["rotated"]).lower()}}}, '
+                    f'-- {count}: {texture["name"]}\n')
 
-    lua += '\t\t{x = ' + x + ', y = ' + y + ', width = ' + width + ', height = ' + height + ', offsetX = ' + offsetx + ', offsetY = ' + offsety + ', offsetWidth = ' + offsetWidth + ', offsetHeight = ' + offsetHeight + ', rotated = ' + rotated + '}, -- ' + str(c) + ': ' + name + '\n'
+            if baseName in animLists:
+                curAnim = animLists[baseName]
+            else:
+                curAnim = {}
+                animLists[baseName] = curAnim
+                curAnim["start"] = str(count)
 
-    realName = re.sub(r'\d+$', '', name)
+            curAnim["stop"] = str(count)
+            curAnim["speed"] = '24'
+            curAnim["offsetX"] = '0'
+            curAnim["offsetY"] = '0'
+            curAnim["name"] = baseName
 
-    if realName in animLists:
-        curAnim = animLists[realName]
+    lua += '\t},\n'
+    lua += "\t{\n"
+
+    for animName, animData in animLists.items():
+        lua += (f'\t\t["{animData["name"]}"] = {{start = {animData["start"]}, '
+                f'stop = {animData["stop"]}, speed = {animData["speed"]}, '
+                f'offsetX = {animData["offsetX"]}, offsetY = {animData["offsetY"]}}},\n')
+
+    lua += '\t},\n'
+    lua += f'\t"{random.choice(list(animLists.values()))["name"]}",\n'
+    lua += '\tfalse\n'
+    lua += ")"
+
+    luaFile = xmlName.replace('.xml', '') + '.lua'
+    with open(luaFile, 'w') as f:
+        f.write(lua)
+    print(f"Converted {xmlName} to Lua script.")
+
+def processPath(path):
+    if os.path.isdir(path):
+        for filename in os.listdir(path):
+            if filename.endswith('.xml'):
+                xmlPath = os.path.join(path, filename)
+                generateLuaFromXml(xmlPath)
+    elif os.path.isfile(path) and path.endswith('.xml'):
+        generateLuaFromXml(path)
     else:
-        curAnim = {}
-        animLists[realName] = curAnim
-        curAnim["start"] = str(c) 
+        print(f"Skipped {path}: not an XML file or directory.")
 
-    curAnim["stop"] = str(c)
-    curAnim["speed"] = str(24)
-    curAnim["offsetX"] = str(0)
-    curAnim["offsetY"] = str(0)
-    curAnim["name"] = realName
-
-lua += '\t},\n'
-
-lua += "\t{\n"
-
-for animName, animData in animLists.items():
-    lua += '\t\t["' + animData["name"] + '"] = {start = ' + str(animData["start"]) + ', stop = ' + str(animData['stop']) + ', speed = ' + str(animData["speed"]) + ', offsetX = ' + str(animData["offsetX"]) + ', offsetY = ' + str(animData["offsetY"]) + '},\n'
-
-lua += '\t},\n'
-
-lua += f'\t"{random.choice(list(animLists.values()))["name"]}",\n'
-lua += f'\tfalse\n'
-
-lua += ")"
-
-# remove .xml from xmlname
-luaFile = xmlname.replace('.xml', '') + '.lua'
-
-with open(luaFile, 'w') as f:
-    f.write(lua)
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python script.py <path1> [<path2> ... <pathN>]")
+    else:
+        for arg in sys.argv[1:]:
+            processPath(arg)

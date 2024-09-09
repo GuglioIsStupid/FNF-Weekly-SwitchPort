@@ -91,6 +91,7 @@ function Timer:cancel(handle)
 end
 
 function Timer:clear()
+	DID_THE_FUCKING_TWEENS = false
 	 self.functions = {}
 end
 

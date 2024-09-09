@@ -194,9 +194,9 @@ end
 
 function modManager:getBaseX(direction, player)
     local x = 0
-    if player == 1 then
+    if player == 2 then
         x = -925 + 165 * direction
-    elseif player == 2 then
+    elseif player == 1 then
         x = 100 + 165 * direction
     end
 

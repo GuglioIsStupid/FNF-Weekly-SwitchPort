@@ -1,6 +1,6 @@
 return { -- Add/remove weeks here
     {
-        "TWEAKING BOSS",
+        "TWEAK 0",
         {
             "Boss tweaks in brasil",
             "Teaking",
