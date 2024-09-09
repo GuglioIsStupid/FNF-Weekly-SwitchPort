@@ -40,6 +40,8 @@ return {
 		weeks:setupCountdown()
 
 		camera.lockedMoving = true
+
+		stage:postLoad()
 	end,
 
 	initUI = function(self)
@@ -68,8 +70,8 @@ return {
 
 		weeks:checkSongOver()
 
-		if beatHandler.onBeat() then
-			local beat = beatHandler.getBeat()
+		if Conductor.onBeat then
+			local beat = Conductor.curBeat
 
 			if song == 1 then
 				if beat == 191 then

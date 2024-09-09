@@ -241,23 +241,39 @@ return {
 			end
 		end
 
-		-- Function so people can override it if they want
-		-- Do some cool note effects or something!
 		function updateNotePos()
-		for i = 1, 4 do
-			for j, note in ipairs(boyfriendNotes[i]) do
-				if note.time - musicTime >= 15000 then break end
-				local strumlineY = boyfriendArrows[i].y
-				note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
-			end
+			for i = 1, 4 do
+				local pStrum = boyfriendArrows[i]
+				local playerPos = modManager:getPos(0, 0, 0, Conductor.curDecBeat, pStrum.data, 1, pStrum, {}, pStrum.vec3Cache)
+				modManager:updateStrum(Conductor.curDecBeat, playerPos, playerPos, 1)
+				pStrum.x, pStrum.y = playerPos.x, playerPos.y
 
-			for _, note in ipairs(enemyNotes[i]) do
-				if note.time - musicTime >= 15000 then break end
-				local strumlineY = enemyArrows[i].y
-				note.y = strumlineY - CONSTANTS.WEEKS.PIXELS_PER_MS * (musicTime - note.time) * speed--[[ (strumlineY - (musicTime - note.time) * (0.45 * math.roundDecimal(speed,2))) ]]
+				local eStrum = enemyArrows[i]
+				local enemyPos = modManager:getPos(0, 0, 0, Conductor.curDecBeat, eStrum.data, 2, eStrum, {}, eStrum.vec3Cache)
+				modManager:updateStrum(Conductor.curDecBeat, enemyPos, enemyPos, 2)
+				eStrum.x, eStrum.y = enemyPos.x, enemyPos.y
+
+				for j, note in ipairs(boyfriendNotes[i]) do
+					if note.time - musicTime >= 2000 then break end
+
+					local visPos = -(0.45 * (musicTime - note.time) * speed)
+					local pos = modManager:getPos(note.time, visPos, note.time - musicTime, Conductor.curDecBeat, note.data, 1, {}, note.vec3Cache)
+					modManager:updateNote(Conductor.curDecBeat, note, pos, 1)
+
+					note.x, note.y = pos.x, pos.y
+				end
+
+				for _, note in ipairs(enemyNotes[i]) do
+					if note.time - musicTime >= 2000 then break end
+
+					local visPos = -(0.45 * (musicTime - note.time) * speed)
+					local pos = modManager:getPos(note.time, visPos, note.time - musicTime, Conductor.curDecBeat, note.data, 2, {}, note.vec3Cache)
+					modManager:updateNote(Conductor.curDecBeat, note, pos, 1)
+
+					note.x, note.y = pos.x, pos.y
+				end
 			end
 		end
-end
 
 		enemyIcon = icon.newIcon(icon.imagePath((enemy and enemy.icon) and enemy.icon) or "dad", (enemy and enemy.optionsTable) and (enemy.optionsTable.scale or 1) or 1)
 		boyfriendIcon = icon.newIcon(icon.imagePath((boyfriend and boyfriend.icon) and boyfriend.icon) or "bf", (boyfriend and boyfriend.optionsTable) and (boyfriend.optionsTable.scale or 1) or 1)
@@ -459,10 +475,16 @@ end
 				boyfriendArrows[i].sizeY = -1
 			end
 
+			enemyArrows[i].data = i
+			boyfriendArrows[i].data = i
+
 			enemyNotes[i] = {}
 			boyfriendNotes[i] = {}
 			gfNotes[i] = {}
 		end
+
+		modManager.receptors = {boyfriendArrows, enemyArrows}
+		modManager:registerDefaultModifiers()
 
 		NoteSplash:setup()
 		HoldCover:setup()
@@ -776,6 +798,10 @@ end
 		end
 		if inCutscene then return end
 		beatHandler.update(dt)
+		Conductor.update(dt)
+
+		modManager:updateTimeline(Conductor.curDecStep)
+		modManager:update(dt)
 
 		oldMusicThres = musicThres
 		if countingDown or love.system.getOS() == "Web" then -- Source:tell() can't be trusted on love.js!
@@ -903,7 +929,7 @@ end
 			end
 		end
 
-		if (beatHandler.onBeat() and beatHandler.getBeat() % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
+		if (Conductor.onBeat and Conductor.curBeat % camera.camBopInterval == 0 and camera.zooming and camera.zoom < 1.35 and not camera.locked) then 
 			camera.zoom = camera.zoom + 0.015 * camera.camBopIntensity
 			uiCam.zoom = uiCam.zoom + 0.03 * camera.camBopIntensity
 		end
@@ -917,7 +943,7 @@ end
 		if enemy then enemy:update(dt) end
 		if boyfriend then boyfriend:update(dt) end
 
-		if beatHandler.onBeat() then
+		if Conductor.onBeat then
 			if boyfriend then boyfriend:beat(beatHandler.getBeat()) end
 			if enemy then enemy:beat(beatHandler.getBeat()) end
 			if girlfriend then girlfriend:beat(beatHandler.getBeat()) end
@@ -1334,7 +1360,7 @@ end
 		enemyIcon.x = 425 - healthLerp * 500
 		boyfriendIcon.x = 585 - healthLerp * 500
 
-		if beatHandler.onBeat() then
+		if Conductor.onBeat then
 			enemyIcon.sizeX, enemyIcon.sizeY = 1.75, 1.75
 			boyfriendIcon.sizeX, boyfriendIcon.sizeY = -1.75, 1.75
 		end

@@ -383,11 +383,11 @@ function Sprite:beat(beat)
     local beat = math.floor(beat) or 0
     local curAnimName = self:getAnimName()
     if not curAnimName then return end
-    if beatHandler.onBeat() then
+    if Conductor.onBeat then
         if self:isAnimName("idle") then
             if (not self:isAnimated() and util.startsWith(self:getAnimName(), "sing")) or (self:getAnimName() == "idle" or self:getAnimName() == "idle loop") then
                 if self.lastHit ~= nil and self.lastHit > 0 then
-                    if beat % 2 == 0 and self.lastHit + beatHandler.stepCrochet * self.singDuration <= musicTime then
+                    if beat % 2 == 0 and self.lastHit + Conductor.stepCrochet * self.singDuration <= musicTime then
                         self:animate("idle", true)
                     end
                 elseif beat % 2 == 0 then

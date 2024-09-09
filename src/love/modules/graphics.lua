@@ -295,6 +295,8 @@ local graphics = {
 			shader = nil,
 			shaderEnabled = true,
 
+			vec3Cache = {x = 0, y = 0, z = 0},
+
 			setSheet = function(self, imageData)
 				sheet = imageData
 				sheetWidth = sheet:getWidth()

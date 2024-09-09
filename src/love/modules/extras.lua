@@ -3,6 +3,8 @@ function weeks.legacyGenerateNotes(self, chart)
 	self.overrideDrawHealthbar = importMods.uiHealthbarMod or nil
     local chart = getFilePath(chart)
     chart = json.decode(love.filesystem.read(chart)).song
+    self.song = chart
+    Conductor.mapBPMChanges(chart)
 
     for i = 1, #chart.notes do
         bpm = chart.notes[i].bpm
@@ -16,6 +18,7 @@ function weeks.legacyGenerateNotes(self, chart)
     local totalSteps = 0
     local totalPos = 0
     beatHandler.setBPM(bpm)
+    Conductor.changeBPM(chart.bpm)
 
     if settings.customScrollSpeed == 1 then
         speed = (chart.speed or 1) + 0.5
@@ -78,6 +81,8 @@ function weeks.legacyGenerateNotes(self, chart)
 			noteObject.shader:send("g", g)
 			noteObject.shader:send("b", b)
 
+            noteObject.data = noteType % 4 + 1
+
             table.insert(notesTable[id], noteObject)
             if holdLength > 0 then
                 for k = 71 / speed, holdLength, 71 / speed do
@@ -87,6 +92,7 @@ function weeks.legacyGenerateNotes(self, chart)
                     holdNote.ver = noteVer
                     holdNote.time = time + k
                     holdNote:animate("hold")
+                    holdNote.data = noteType % 4 + 1
 
                     holdNote.x = arrowsTable[id].x
                     holdNote.shader = noteObject.shader

@@ -186,6 +186,7 @@ function love.load()
 	icon = require "modules.Icon"
 	camera = require "modules.camera"
 	beatHandler = require "modules.beatHandler"
+	Conductor = require("modules.Conductor").new()
 	util = require "modules.util"
 	cutscene = require "modules.cutscene"
 	dialogue = require "modules.dialogue"
@@ -199,6 +200,9 @@ function love.load()
 	waveform = require "modules.waveform"
 	loadSavedata()
 	settings.pixelPerfect = false
+
+	modManager = require("modchart.modManager")
+	modManager:new()
 
 	-- Load Characters
 	BaseCharacter = require "data.characters.BaseCharacter"

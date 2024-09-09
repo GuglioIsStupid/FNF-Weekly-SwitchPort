@@ -3,10 +3,14 @@ local function middleshit(self, mid)
         self.tik.alpha = 1
         self.bar.alpha = 1
         hideUI = true
+        modManager:setValue("opponentSwap", 0.5, 1)
+        modManager:setValue("transformX", -5000, 2)
     else
         self.tik.alpha = 0
         self.bar.alpha = 0
         hideUI = false
+        modManager:setValue("opponentSwap", 0, 1)
+        modManager:setValue("transformX", 0, 2)
     end
 end
 
@@ -78,10 +82,18 @@ return {
         end
     end,
 
+    postLoad = function(self)
+        if song == 1 then
+            modManager:setValue("opponentSwap", 0.5, 1);
+            
+            modManager:setValue("transformX", -5000, 2);
+        end
+    end,
+
     update = function(self, dt)
-        if beatHandler.onBeat() then
+        if Conductor.onBeat then
             if not boyfriendIcon then return end
-            local beat = beatHandler.beat
+            local beat = Conductor.curBeat
             local targetRotate = math.rad(beat / 2)
             if beat % 2 == 0 then
                 targetRotate = targetRotate * -1
@@ -94,17 +106,17 @@ return {
             Timer.tween(0.3, enemyIcon, {orientation = 0}, "out-quad")
         end
 
-        if beatHandler.onStep() then
-            local step = beatHandler.curStep
+        if Conductor.onStep then
+            local step = Conductor.curStep
 
             if song == 2 then
-                if step == 160 then
+                if step == 130 then
                     middleshit(self, true)
-                elseif step == 216 then
+                elseif step == 176 then
                     middleshit(self, false)
-                elseif step == 560 then
+                elseif step == 510 then
                     self.pee.alpha = 1
-                elseif step == 574 then
+                elseif step == 517 then
                     Timer.tween(2, self.bee, {alpha = 1})
                 end
             end
